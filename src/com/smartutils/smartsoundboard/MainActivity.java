@@ -1,11 +1,17 @@
 package com.smartutils.smartsoundboard;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
@@ -59,13 +65,24 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
 	}
 	
+	private void downloadDank(String string) {
+	
+		ProgressDialog dankweed = new ProgressDialog(this);
+		dankweed.setTitle("Downloading dank beatz");
+		dankweed.setMessage("Hold on right kwik");
+		dankweed.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+		dankweed.setProgress(0);
+		dankweed.setMax(100);
+		new DankDownloader(string, dankweed);
+	}
+	
 	public final void onNavigationDrawerItemSelected(int position) {
 	
 		System.out.println(position);
 		
 		// run is for weird android thing
 		if (position == 0 && run) {
-			EditText textField = new EditText(MainActivity.this);
+			final EditText textField = new EditText(MainActivity.this);
 			textField.setHint("Enter the URL");
 			new AlertDialog.Builder(MainActivity.this).setTitle("Please Enter a Link to a sound file").setView(textField)
 					.setPositiveButton("Download", new DialogInterface.OnClickListener() {
@@ -73,10 +90,12 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 						
+							downloadDank(textField.getText().toString());
 							dialog.cancel();
 							dialog.dismiss();
 							dialog = null;
 						}
+						
 					}).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 						
 						@Override
@@ -153,9 +172,48 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 				
 				player.start();
 				
+				while (player.isPlaying()) {
+					continue;
+				}
+				
+				player.release();
+				
 			} catch (IOException e) {
+				e.printStackTrace();
 			}
 			return null;
+		}
+		
+	}
+	
+	private class DankDownloader extends AsyncTask<Void, Void, Void> {
+		
+		private ProgressDialog d;
+		private String url;
+		
+		private DankDownloader(String url, ProgressDialog dankweed) {
+		
+			d = dankweed;
+			this.url = url;
+		}
+		
+		@Override
+		protected Void doInBackground(Void... params) {
+		
+			try {
+				URL toDownload = new URL(url);
+				d.show();
+				URLConnection dank = toDownload.openConnection();
+				dank.connect();
+				InputStream weed = dank.getInputStream();
+				FileOutputStream ohbabyatriple = openFileOutput(toDownload.getFile(), Context.MODE_PRIVATE);
+				
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return null;
+			
 		}
 		
 	}
