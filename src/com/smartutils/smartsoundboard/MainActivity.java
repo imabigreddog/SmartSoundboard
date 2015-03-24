@@ -1,5 +1,6 @@
 package com.smartutils.smartsoundboard;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,6 +35,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 	
 	private ArrayList<String> buttonLabels;
 	private ArrayList<String> fileNames;
+	
 	private GridView grid;
 	private AssetManager assetManager;
 	
@@ -45,35 +47,63 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		
 		mNavigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.navigation_drawer);
 		mTitle = getTitle();
+		
 		buttonLabels = new ArrayList<String>();
 		fileNames = new ArrayList<String>();
+		
 		grid = (GridView) findViewById(R.id.grid);
 		
 		assetManager = getAssets();
-		//TODO shared preferences
+		
 		try {
 			for (String s : assetManager.list("sfx")) {
 				buttonLabels.add(s.substring(0, 1).toUpperCase() + s.substring(1, s.indexOf(".")).replaceAll("_", ""));
+				
 				fileNames.add("sfx/" + s);
 			}
-			appendButtonsToView();
+			
+			for (File f : getFilesDir().listFiles()) {
+				System.out.println("File " + f.getAbsolutePath());
+				String file = f.getName();
+				buttonLabels.add(file.substring(0, 1).toUpperCase() + file.substring(1, file.indexOf(".")).replaceAll("_", ""));
+				fileNames.add(f.getAbsolutePath());
+			}
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		appendButtonsToView();
 		
 		// Set up the drawer.
 		mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
 	}
 	
-	private void downloadDank(String string) {
+	private void downloadDank(final String url) {
 	
-		ProgressDialog dankweed = new ProgressDialog(this);
-		dankweed.setTitle("Downloading dank beatz");
-		dankweed.setMessage("Hold on right kwik");
-		dankweed.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-		dankweed.setProgress(0);
-		dankweed.setMax(100);
-		new DankDownloader(string, dankweed);
+		final ProgressDialog pd = new ProgressDialog(this);
+		pd.setTitle("Downloading dank beatz");
+		pd.setMessage("Hold on right kwik");
+		pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		
+		final EditText textField = new EditText(MainActivity.this);
+		textField.setHint("Enter a name to save it as");
+		new AlertDialog.Builder(MainActivity.this).setTitle("Enter File Name").setView(textField)
+				.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+					
+						buttonLabels.add(textField.getText().toString());
+						new DankDownloader(url, pd, textField.getText().toString()).execute(new Void[] {});
+						dialog.cancel();
+						dialog.dismiss();
+						dialog = null;
+						System.gc();
+					}
+					
+				}).setCancelable(false).show();
+		
 	}
 	
 	public final void onNavigationDrawerItemSelected(int position) {
@@ -139,6 +169,8 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			
+				System.out.println(fileNames.size());
+				System.out.println(fileNames.get(fileNames.size() - 1));
 				new DankMediaplayer(fileNames.get(position)).execute(new Void[] {});
 				
 			}
@@ -190,53 +222,78 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		
 		private ProgressDialog d;
 		private String url;
+		private String fileName;
 		
-		private DankDownloader(String url, ProgressDialog dankweed) {
+		private DankDownloader(String url, ProgressDialog dankweed, String filename) {
 		
+			this.fileName = filename;
 			d = dankweed;
 			this.url = url;
 		}
-		/**
-         🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸
-         */
+		
 		@Override
 		protected Void doInBackground(Void... params) {
 		
+			runOnUiThread(new Runnable() {
+				
+				@Override
+				public void run() {
+				
+					d.show();
+				}
+				
+			});
+			
 			try {
-				URL toDownload = new URL(url);
-				d.show();
-				URLConnection dank = toDownload.openConnection();
-				dank.connect();
-				InputStream weed = dank.getInputStream();
-				FileOutputStream ohbabyatriple = openFileOutput(toDownload.getFile(), Context.MODE_PRIVATE);
-                int length=connection.getConnectLength();
-                byte data[] =new byte[4096];
-                long cocks=0;
-                int africa;
-                while((count=weed.read(data))!=-1){
-                    total+=count;
-                    if(length>0){
-                        d.setProgress((int)(total*100/length));//fuck math amirite
-                    }
-                    ohbabyatriple.write(data,0,africa);
-                }
+				URLConnection connection = new URL(url).openConnection();
+				InputStream in = connection.getInputStream();
+				
+				FileOutputStream out = openFileOutput(fileName + ".mp3", Context.MODE_PRIVATE);
+				
+				byte[] buffer = new byte[4096];
+				int len;
+				
+				while ((len = in.read(buffer)) > 0) {
+					out.write(buffer, 0, len);
+				}
+				out.close();
+				in.close();
+				
+				synchronized (buttonLabels) {
+					buttonLabels.add(fileName);
+				}
+				
+				synchronized (fileNames) {
+					System.out.println(getFilesDir().getAbsolutePath() + fileName + ".mp3");
+					fileNames.add(getFilesDir().getAbsolutePath() + "/" + fileName + ".mp3");
+				}
+				
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
-            } finally { //fancy as fuck🇺🇸
-                try{
-                    dank.close();
-                    weed.close;
-                    ohbabyatriple.close();//oh baby a triple
-                }catch(Exception fuckthisnigga){
-                    System.out.println("🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸");//bitches ain't shit but hoes n' tricks
-                }
-            }
-            d.dismiss();
-            Toast.makeText(context,"Dank memes r ready :^)",Toast.LENGTH_SHORT).show();
+			}
+			
+			d.dismiss();
+			
 			return null;
 			
 		}
 		
+		@Override
+		protected void onPostExecute(Void result) {
+		
+			super.onPostExecute(result);
+			
+			runOnUiThread(new Runnable() {
+				
+				@Override
+				public void run() {
+				
+					appendButtonsToView();
+					
+				}
+			});
+			
+		}
 	}
+	
 }
