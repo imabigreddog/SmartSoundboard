@@ -44,7 +44,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		grid = (GridView) findViewById(R.id.grid);
 		
 		assetManager = getAssets();
-		
+		//TODO shared preferences
 		try {
 			for (String s : assetManager.list("sfx")) {
 				buttonLabels.add(s.substring(0, 1).toUpperCase() + s.substring(1, s.indexOf(".")).replaceAll("_", ""));
