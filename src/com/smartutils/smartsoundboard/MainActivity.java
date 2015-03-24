@@ -196,7 +196,9 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 			d = dankweed;
 			this.url = url;
 		}
-		
+		/**
+         🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸
+         */
 		@Override
 		protected Void doInBackground(Void... params) {
 		
@@ -207,11 +209,31 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 				dank.connect();
 				InputStream weed = dank.getInputStream();
 				FileOutputStream ohbabyatriple = openFileOutput(toDownload.getFile(), Context.MODE_PRIVATE);
-				
+                int length=connection.getConnectLength();
+                byte data[] =new byte[4096];
+                long cocks=0;
+                int africa;
+                while((count=weed.read(data))!=-1){
+                    total+=count;
+                    if(length>0){
+                        d.setProgress((int)(total*100/length));//fuck math amirite
+                    }
+                    ohbabyatriple.write(data,0,africa);
+                }
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
+            } finally { //fancy as fuck🇺🇸
+                try{
+                    dank.close();
+                    weed.close;
+                    ohbabyatriple.close();//oh baby a triple
+                }catch(Exception fuckthisnigga){
+                    System.out.println("🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸");//bitches ain't shit but hoes n' tricks
+                }
+            }
+            d.dismiss();
+            Toast.makeText(context,"Dank memes r ready :^)",Toast.LENGTH_SHORT).show();
 			return null;
 			
 		}
