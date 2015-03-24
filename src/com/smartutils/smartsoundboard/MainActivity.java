@@ -25,6 +25,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 	
@@ -209,31 +210,23 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 				dank.connect();
 				InputStream weed = dank.getInputStream();
 				FileOutputStream ohbabyatriple = openFileOutput(toDownload.getFile(), Context.MODE_PRIVATE);
-                int length=connection.getConnectLength();
+                int length=dank.getContentLength();
                 byte data[] =new byte[4096];
                 long cocks=0;
                 int africa;
-                while((count=weed.read(data))!=-1){
-                    total+=count;
+                while((africa=weed.read(data))!=-1){
+                    cocks+=africa;
                     if(length>0){
-                        d.setProgress((int)(total*100/length));//fuck math amirite
+                        d.setProgress((int)(cocks*100/length));//fuck math amirite
                     }
                     ohbabyatriple.write(data,0,africa);
                 }
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-            } finally { //fancy as fuck🇺🇸
-                try{
-                    dank.close();
-                    weed.close;
-                    ohbabyatriple.close();//oh baby a triple
-                }catch(Exception fuckthisnigga){
-                    System.out.println("🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸");//bitches ain't shit but hoes n' tricks
-                }
             }
             d.dismiss();
-            Toast.makeText(context,"Dank memes r ready :^)",Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this,"Dank memes r ready :^)",Toast.LENGTH_SHORT).show();
 			return null;
 			
 		}
