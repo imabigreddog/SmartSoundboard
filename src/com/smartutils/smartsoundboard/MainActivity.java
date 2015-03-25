@@ -26,6 +26,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 	
@@ -245,6 +246,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 			});
 			
 			try {
+<<<<<<< HEAD
 				URLConnection connection = new URL(url).openConnection();
 				InputStream in = connection.getInputStream();
 				
@@ -268,12 +270,37 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 					fileNames.add(getFilesDir().getAbsolutePath() + "/" + fileName + ".mp3");
 				}
 				
+=======
+				URL toDownload = new URL(url);
+				d.show();
+				URLConnection dank = toDownload.openConnection();
+				dank.connect();
+				InputStream weed = dank.getInputStream();
+				FileOutputStream ohbabyatriple = openFileOutput(toDownload.getFile(), Context.MODE_PRIVATE);
+                int length=dank.getContentLength();
+                byte data[] =new byte[4096];
+                long cocks=0;
+                int africa;
+                while((africa=weed.read(data))!=-1){
+                    cocks+=africa;
+                    if(length>0){
+                        d.setProgress((int)(cocks*100/length));//fuck math amirite
+                    }
+                    ohbabyatriple.write(data,0,africa);
+                }
+>>>>>>> origin/master
 			} catch (Exception e) {
 				e.printStackTrace();
+<<<<<<< HEAD
 			}
 			
 			d.dismiss();
 			
+=======
+            }
+            d.dismiss();
+            Toast.makeText(MainActivity.this,"Dank memes r ready :^)",Toast.LENGTH_SHORT).show();
+>>>>>>> origin/master
 			return null;
 			
 		}
