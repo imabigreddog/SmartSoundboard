@@ -1,6 +1,7 @@
 package com.smartutils.smartsoundboard;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +27,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
-import android.widget.Toast;
 
 public class MainActivity extends Activity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 	
@@ -193,23 +193,35 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		protected Void doInBackground(Void... params) {
 		
 			try {
-				AssetFileDescriptor descriptor = assetManager.openFd(fileName);
-				MediaPlayer player = new MediaPlayer();
-				long start = descriptor.getStartOffset();
-				long end = descriptor.getLength();
 				
-				player.setDataSource(descriptor.getFileDescriptor(), start, end);
-				descriptor.close();
-				player.setVolume(1f, 1f);
-				player.prepare();
-				
-				player.start();
-				
-				while (player.isPlaying()) {
-					continue;
+				if (fileName.contains("sfx")) {
+					AssetFileDescriptor descriptor = assetManager.openFd(fileName);
+					MediaPlayer player = new MediaPlayer();
+					long start = descriptor.getStartOffset();
+					long end = descriptor.getLength();
+					
+					player.setDataSource(descriptor.getFileDescriptor(), start, end);
+					descriptor.close();
+					player.setVolume(1f, 1f);
+					player.prepare();
+					
+					player.start();
+				} else {
+					FileInputStream in = null;
+					try {
+						MediaPlayer player = new MediaPlayer();
+						
+						in = new FileInputStream(fileName);
+						player.setDataSource(in.getFD());
+						
+						player.setVolume(1f, 1f);
+						player.prepare();
+						
+						player.start();
+					} finally {
+						in.close();
+					}
 				}
-				
-				player.release();
 				
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -246,7 +258,6 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 			});
 			
 			try {
-<<<<<<< HEAD
 				URLConnection connection = new URL(url).openConnection();
 				InputStream in = connection.getInputStream();
 				
@@ -270,37 +281,12 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 					fileNames.add(getFilesDir().getAbsolutePath() + "/" + fileName + ".mp3");
 				}
 				
-=======
-				URL toDownload = new URL(url);
-				d.show();
-				URLConnection dank = toDownload.openConnection();
-				dank.connect();
-				InputStream weed = dank.getInputStream();
-				FileOutputStream ohbabyatriple = openFileOutput(toDownload.getFile(), Context.MODE_PRIVATE);
-                int length=dank.getContentLength();
-                byte data[] =new byte[4096];
-                long cocks=0;
-                int africa;
-                while((africa=weed.read(data))!=-1){
-                    cocks+=africa;
-                    if(length>0){
-                        d.setProgress((int)(cocks*100/length));//fuck math amirite
-                    }
-                    ohbabyatriple.write(data,0,africa);
-                }
->>>>>>> origin/master
 			} catch (Exception e) {
 				e.printStackTrace();
-<<<<<<< HEAD
 			}
 			
 			d.dismiss();
 			
-=======
-            }
-            d.dismiss();
-            Toast.makeText(MainActivity.this,"Dank memes r ready :^)",Toast.LENGTH_SHORT).show();
->>>>>>> origin/master
 			return null;
 			
 		}
