@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 	
@@ -95,7 +97,6 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 					
-						buttonLabels.add(textField.getText().toString());
 						new DankDownloader(url, pd, textField.getText().toString()).execute(new Void[] {});
 						dialog.cancel();
 						dialog.dismiss();
@@ -258,7 +259,23 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 			});
 			
 			try {
-				URLConnection connection = new URL(url).openConnection();
+				
+				URLConnection connection;
+				try {
+					connection = new URL(url).openConnection();
+				} catch (MalformedURLException x) {
+					d.dismiss();
+					runOnUiThread(new Runnable() {
+						
+						@Override
+						public void run() {
+						
+							Toast.makeText(getBaseContext(), "Invalid Url", Toast.LENGTH_LONG).show();
+						}
+						
+					});
+					return null;
+				}
 				InputStream in = connection.getInputStream();
 				
 				FileOutputStream out = openFileOutput(fileName + ".mp3", Context.MODE_PRIVATE);
