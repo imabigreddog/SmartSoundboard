@@ -9,6 +9,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.List;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -42,6 +43,8 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 	private GridView grid;
 	private AssetManager assetManager;
 	
+	private List<MediaPlayer> players;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 	
@@ -53,6 +56,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		
 		buttonLabels = new ArrayList<String>();
 		fileNames = new ArrayList<String>();
+		players = new ArrayList<MediaPlayer>();
 		
 		grid = (GridView) findViewById(R.id.grid);
 		
@@ -80,6 +84,31 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		
 		// Set up the drawer.
 		mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
+		
+		Thread d = new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+			
+				while (true) {
+					
+					synchronized (players) {
+						for (int i = 0; i < players.size(); i++) {
+							if (!players.get(i).isPlaying()) {
+								System.out.println(players.get(i) + " is released");
+								players.get(i).release();
+								players.remove(i);
+								i--;
+							}
+						}
+					}
+					
+				}
+				
+			}
+		});
+		d.setDaemon(true);
+		d.start();
 	}
 	
 	private void downloadDank(final String url) {
@@ -219,6 +248,11 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 						player.prepare();
 						
 						player.start();
+						
+						synchronized (players) {
+							players.add(player);
+						}
+						
 					} finally {
 						in.close();
 					}
