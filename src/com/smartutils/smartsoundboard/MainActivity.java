@@ -10,6 +10,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -67,7 +68,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 
 		try {
 			for (String s : assetManager.list("sfx")) {
-				buttonLabels.add(s.substring(0, 1).toUpperCase() + s.substring(1, s.indexOf(".")).replaceAll("_", ""));
+				buttonLabels.add(s.substring(0, 1).toUpperCase(Locale.US) + s.substring(1, s.indexOf(".")).replaceAll("_", ""));
 
 				fileNames.add("sfx/" + s);
 			}
@@ -75,7 +76,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 			for (File f : getFilesDir().listFiles()) {
 				System.out.println("File " + f.getAbsolutePath());
 				String file = f.getName();
-				buttonLabels.add(file.substring(0, 1).toUpperCase() + file.substring(1, file.indexOf(".")).replaceAll("_", ""));
+				buttonLabels.add(file.substring(0, 1).toUpperCase(Locale.US) + file.substring(1, file.indexOf(".")).replaceAll("_", ""));
 				fileNames.add(f.getAbsolutePath());
 			}
 
@@ -388,11 +389,6 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		}
 	}
 
-
-	//TODO:Make a drawer button that calls this, make the ProgDialog have the option to throw away or 
-	//TODO:keep the recorded file. Potentially work on saving as MP3, but the current hacky method of 
-	//TODO:using just the extension with the real 3GPP works fine for now. MAKE BUTTONS THAT CALL START & STOP
-
 	private class DankRecorder extends AsyncTask<Void, Void, Void> {
 
 		private final MediaRecorder recorder = new MediaRecorder();
@@ -407,6 +403,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 			mProgressDialog = new ProgressDialog(MainActivity.this);
 			mProgressDialog.setTitle(R.string.record);
 			mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			//fuck you this is America we use whatever methods we want
 			mProgressDialog.setButton("Stop recording", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
 					mProgressDialog.dismiss();
