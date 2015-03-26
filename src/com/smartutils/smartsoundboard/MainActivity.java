@@ -174,23 +174,23 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 
 		} else if(position==1) {
 
-	final EditText textField = new EditText(MainActivity.this);
-		textField.setHint("Enter a name to save it as");
-		new AlertDialog.Builder(MainActivity.this).setTitle("Enter File Name").setView(textField)
-		.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+			final EditText textField = new EditText(MainActivity.this);
+			textField.setHint("Enter a name to save it as");
+			new AlertDialog.Builder(MainActivity.this).setTitle("Enter File Name").setView(textField)
+			.setPositiveButton("Save", new DialogInterface.OnClickListener() {
 
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
 
-				new DankRecorder(textField.getText().toString()).execute(new Void[]{});
-				dialog.cancel();
-				dialog.dismiss();
-				dialog = null;
-				System.gc();
-			}
+					new DankRecorder(textField.getText().toString()).execute(new Void[]{});
+					dialog.cancel();
+					dialog.dismiss();
+					dialog = null;
+					System.gc();
+				}
 
-		}).setCancelable(false).show();
-	
+			}).setCancelable(false).show();
+
 
 
 		}else
@@ -276,8 +276,12 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 							players.add(player);
 						}
 
-					} finally {
-						in.close();
+					}catch(Exception e){
+						e.printStackTrace();
+					}
+					finally {
+						if(in!=null)
+							in.close();
 					}
 				}
 
@@ -390,7 +394,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 	//TODO:using just the extension with the real 3GPP works fine for now. MAKE BUTTONS THAT CALL START & STOP
 
 	private class DankRecorder extends AsyncTask<Void, Void, Void> {
-	
+
 		private final MediaRecorder recorder = new MediaRecorder();
 		private ProgressDialog mProgressDialog;
 		private String fileName;
@@ -406,8 +410,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 			mProgressDialog.setButton("Stop recording", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
 					mProgressDialog.dismiss();
-					recorder.stop();
-					recorder.release();
+					stopRecording();
 				}
 			});
 
@@ -417,7 +420,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 					recorder.release();
 				}
 			});
-			recorder.start();
+			startRecording();
 			mProgressDialog.show();
 		}
 
@@ -437,9 +440,10 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 
 		}
 		private void startRecording() {
+			mRecorder=new MediaRecorder();
 			mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 			mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-			mRecorder.setOutputFile(fileName+".mp3");
+			mRecorder.setOutputFile(getFilesDir().getAbsolutePath() +"/"+  fileName+".mp3");
 			mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 
 			try {
@@ -451,10 +455,9 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 			mRecorder.start();		
 
 		}
-		
+
 
 		private void stopRecording(){
-
 			mRecorder.stop();
 			mRecorder.release();
 			mRecorder=null;
