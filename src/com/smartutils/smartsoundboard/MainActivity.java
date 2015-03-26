@@ -29,6 +29,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
@@ -201,6 +202,51 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 				System.out.println(fileNames.size());
 				System.out.println(fileNames.get(fileNames.size() - 1));
 				new DankMediaplayer(fileNames.get(position)).execute(new Void[] {});
+				
+			}
+		});
+		
+		grid.setOnItemLongClickListener(new OnItemLongClickListener() {
+			
+			@Override
+			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, final long id) {
+			
+				new AlertDialog.Builder(MainActivity.this).setTitle("Are you sure you want to delete?")
+						.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+							
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+							
+								String label = buttonLabels.get((int) id);
+								buttonLabels.remove(label);
+								
+								String filePath = fileNames.get((int) id);
+								
+								new File(filePath).delete();
+								
+								fileNames.remove(filePath);
+								
+								dialog.cancel();
+								dialog.dismiss();
+								dialog = null;
+								
+								appendButtonsToView();
+								
+							}
+							
+						}).setCancelable(false).setNegativeButton("No", new DialogInterface.OnClickListener() {
+							
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+							
+								dialog.cancel();
+								dialog.dismiss();
+								dialog = null;
+								
+							}
+						}).show();
+				
+				return false;
 				
 			}
 		});
@@ -392,6 +438,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 			mProgressDialog = new ProgressDialog(MainActivity.this);
 			mProgressDialog.setTitle(R.string.record);
 			mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			mProgressDialog.setCancelable(true);
 			// fuck you this is America we use whatever methods we want
 			mProgressDialog.setButton("Stop recording", new DialogInterface.OnClickListener() {
 				
