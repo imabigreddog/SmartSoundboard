@@ -1,39 +1,19 @@
 package com.smartutils.smartsoundboard;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.io.*;
+import java.net.*;
+import java.util.*;
 
-import android.app.ActionBar;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
+import android.app.*;
+import android.content.*;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
-import android.media.MediaPlayer;
-import android.media.MediaRecorder;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.Message;
+import android.media.*;
+import android.os.*;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
+import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.GridView;
-import android.widget.Toast;
 
 public class MainActivity extends Activity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
@@ -89,30 +69,6 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		// Set up the drawer.
 		mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
 
-		Thread d = new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-
-				while (true) {
-
-					synchronized (players) {
-						for (int i = 0; i < players.size(); i++) {
-							if (!players.get(i).isPlaying()) {
-								System.out.println(players.get(i) + " is released");
-								players.get(i).release();
-								players.remove(i);
-								i--;
-							}
-						}
-					}
-
-				}
-
-			}
-		});
-		d.setDaemon(true);
-		d.start();
 	}
 
 	private void downloadDank(final String url) {
@@ -248,10 +204,10 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		protected Void doInBackground(Void... params) {
 
 			try {
+				final MediaPlayer player = new MediaPlayer();
 
 				if (fileName.contains("sfx")) {
 					AssetFileDescriptor descriptor = assetManager.openFd(fileName);
-					MediaPlayer player = new MediaPlayer();
 					long start = descriptor.getStartOffset();
 					long end = descriptor.getLength();
 
@@ -264,29 +220,30 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 				} else {
 					FileInputStream in = null;
 					try {
-						MediaPlayer player = new MediaPlayer();
 
 						in = new FileInputStream(fileName);
 						player.setDataSource(in.getFD());
 
-						player.setVolume(1f, 1f);
+						player.setVolume(1f,1f);
 						player.prepare();
 
 						player.start();
-						synchronized (players) {
-							players.add(player);
-						}
 
-					}catch(Exception e){
-						e.printStackTrace();
-					}
-					finally {
+
+					}finally {
 						if(in!=null)
 							in.close();
 					}
 				}
-
-			} catch (IOException e) {
+				new Thread(){
+					public void run() {
+						try {
+							Thread.sleep(player.getDuration());
+						} catch (InterruptedException e) {}					
+						player.release();
+					};
+				}.start();
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 
