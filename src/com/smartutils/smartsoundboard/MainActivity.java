@@ -381,18 +381,29 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 
 		@Override
 		protected Void doInBackground(Void... params) {
-
+				d.setMessage("Now recording...");
+				d.setCancelable(true);
+		
 			runOnUiThread(new Runnable()  {
 				MediaRecorder mRecorder=new MediaRecorder();
 				@Override
 				public void run() {
-					d.setMessage("Now recording...");
-					d.setCancelable(true);
+				
 					d.show();
-					startRecording();
+				
 				}
+		
+			startRecording();
+			
+			
+			});
+			
+			
 
-				private void startRecording() {
+			return null;
+
+		}
+		private void startRecording() {
 			        mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 			        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
 			        mRecorder.setOutputFile(fileName+".mp3");
@@ -407,7 +418,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 			        mRecorder.start();		
 			        
 				}
-				private void stopRecording(){
+					private void stopRecording(){
 					
 					mRecorder.stop();
 					mRecorder.release();
@@ -421,14 +432,6 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 						fileNames.add(getFilesDir().getAbsolutePath() + "/" + fileName + ".mp3");
 					}
 				}
-
-			});
-			
-			
-
-			return null;
-
-		}
 
 		@Override
 		protected void onPostExecute(Void result) {
