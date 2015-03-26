@@ -174,7 +174,23 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 
 		} else if(position==1) {
 
+	final EditText textField = new EditText(MainActivity.this);
+		textField.setHint("Enter a name to save it as");
+		new AlertDialog.Builder(MainActivity.this).setTitle("Enter File Name").setView(textField)
+		.setPositiveButton("Save", new DialogInterface.OnClickListener() {
 
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+
+				new DankRecorder(textField.getText().toString()).execute(new Void[]{});
+				dialog.cancel();
+				dialog.dismiss();
+				dialog = null;
+				System.gc();
+			}
+
+		}).setCancelable(false).show();
+	
 
 
 		}else
