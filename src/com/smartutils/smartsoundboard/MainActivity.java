@@ -1,4 +1,4 @@
-package com.smartutils.smartsoundboard;
+
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -363,11 +363,11 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		}
 	}
 
-	
+
 	//TODO:Make a drawer button that calls this, make the ProgDialog have the option to throw away or 
 	//TODO:keep the recorded file. Potentially work on saving as MP3, but the current hacky method of 
 	//TODO:using just the extension with the real 3GPP works fine for now. MAKE BUTTONS THAT CALL START & STOP
-	
+
 	private class DankRecorder extends AsyncTask<Void, Void, Void> {
 
 		private ProgressDialog d;
@@ -377,61 +377,59 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 
 			this.fileName = filename;
 			d = dankweed;
+			d.setMessage("Now recording...");
+			d.setCancelable(true);
 		}
 
 		@Override
 		protected Void doInBackground(Void... params) {
-				d.setMessage("Now recording...");
-				d.setCancelable(true);
+
+
+			MediaRecorder mRecorder=new MediaRecorder();
 		
 			runOnUiThread(new Runnable()  {
-				MediaRecorder mRecorder=new MediaRecorder();
+
 				@Override
 				public void run() {
-				
 					d.show();
-				
 				}
-		
-			startRecording();
-			
-			
+
 			});
 			
-			
+			startRecording();
 
 			return null;
 
 		}
 		private void startRecording() {
-			        mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-			        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-			        mRecorder.setOutputFile(fileName+".mp3");
-			        mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+			mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+			mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+			mRecorder.setOutputFile(fileName+".mp3");
+			mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 
-			        try {
-			            mRecorder.prepare();
-			        } catch (IOException e) {
-			        	e.printStackTrace();
-			        }
+			try {
+				mRecorder.prepare();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 
-			        mRecorder.start();		
-			        
-				}
-					private void stopRecording(){
-					
-					mRecorder.stop();
-					mRecorder.release();
-					mRecorder=null;
-					synchronized (buttonLabels) {
-						buttonLabels.add(fileName);
-					}
+			mRecorder.start();		
 
-					synchronized (fileNames) {
-						System.out.println(getFilesDir().getAbsolutePath() + fileName + ".mp3");
-						fileNames.add(getFilesDir().getAbsolutePath() + "/" + fileName + ".mp3");
-					}
-				}
+		}
+		private void stopRecording(){
+
+			mRecorder.stop();
+			mRecorder.release();
+			mRecorder=null;
+			synchronized (buttonLabels) {
+				buttonLabels.add(fileName);
+			}
+
+			synchronized (fileNames) {
+				System.out.println(getFilesDir().getAbsolutePath() + fileName + ".mp3");
+				fileNames.add(getFilesDir().getAbsolutePath() + "/" + fileName + ".mp3");
+			}
+		}
 
 		@Override
 		protected void onPostExecute(Void result) {
