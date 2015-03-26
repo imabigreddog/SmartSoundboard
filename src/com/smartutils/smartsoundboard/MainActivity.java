@@ -1,4 +1,4 @@
-
+package com.smartutils.smartsoundboard;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -172,7 +172,12 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 				}
 			}).setCancelable(false).show();
 
-		} else
+		} else if(position==1) {
+
+
+
+
+		}else
 			run = true;
 	}
 
@@ -369,24 +374,39 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 	//TODO:using just the extension with the real 3GPP works fine for now. MAKE BUTTONS THAT CALL START & STOP
 
 	private class DankRecorder extends AsyncTask<Void, Void, Void> {
-
+	
+		private final MediaRecorder recorder = new MediaRecorder();
 		private ProgressDialog d;
 		private String fileName;
 
-		private DankRecorder(ProgressDialog dankweed, String filename) {
+		private DankRecorder( String filename) {
 
 			this.fileName = filename;
-			d = dankweed;
-			d.setMessage("Now recording...");
-			d.setCancelable(true);
+
+			d = new ProgressDialog(MyActivity.this);
+			mProgressDialog.setTitle(R.string.lbl_recording);
+			mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			mProgressDialog.setButton("Stop recording", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					mProgressDialog.dismiss();
+					recorder.stop();
+					recorder.release();
+				}
+			});
+
+			mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener(){
+				public void onCancel(DialogInterface p1) {
+					recorder.stop();
+					recorder.release();
+				}
+			});
+			recorder.start();
+			mProgressDialog.show();
 		}
 
 		@Override
 		protected Void doInBackground(Void... params) {
 
-
-			MediaRecorder mRecorder=new MediaRecorder();
-		
 			runOnUiThread(new Runnable()  {
 
 				@Override
@@ -394,9 +414,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 					d.show();
 				}
 
-			});
-			
-			startRecording();
+			});	
 
 			return null;
 
