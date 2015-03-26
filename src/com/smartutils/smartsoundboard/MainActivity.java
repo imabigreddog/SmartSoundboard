@@ -392,15 +392,16 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 	private class DankRecorder extends AsyncTask<Void, Void, Void> {
 	
 		private final MediaRecorder recorder = new MediaRecorder();
-		private ProgressDialog d;
+		private ProgressDialog mProgressDialog;
 		private String fileName;
+		private MediaRecorder mRecorder;
 
 		private DankRecorder( String filename) {
 
 			this.fileName = filename;
 
-			d = new ProgressDialog(MyActivity.this);
-			mProgressDialog.setTitle(R.string.lbl_recording);
+			mProgressDialog = new ProgressDialog(MainActivity.this);
+			mProgressDialog.setTitle(R.string.record);
 			mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 			mProgressDialog.setButton("Stop recording", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
@@ -427,7 +428,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 
 				@Override
 				public void run() {
-					d.show();
+					mProgressDialog.show();
 				}
 
 			});	
@@ -450,6 +451,8 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 			mRecorder.start();		
 
 		}
+		
+
 		private void stopRecording(){
 
 			mRecorder.stop();
