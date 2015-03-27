@@ -154,7 +154,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 			final EditText textField = new EditText(MainActivity.this);
 			textField.setHint("Enter a name to save it as");
 			new AlertDialog.Builder(MainActivity.this).setTitle("Enter File Name").setView(textField)
-					.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+					.setPositiveButton("Start Recording", new DialogInterface.OnClickListener() {
 						
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
@@ -199,8 +199,8 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			
-				System.out.println(fileNames.size());
-				System.out.println(fileNames.get(fileNames.size() - 1));
+				System.out.println(fileNames.get(position));
+				
 				new DankMediaplayer(fileNames.get(position)).execute(new Void[] {});
 				
 			}
