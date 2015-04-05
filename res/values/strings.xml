@@ -4,7 +4,7 @@
     <string name="app_name">Smart Soundboard</string>
     <string name="download">Add Sound From Link</string>
     <string name="action_settings">Hello</string>
-    <string name="action_example">Dog</string>
+    <string name="stopAll">Stop Playing</string>
     <string name="record">Record Sound</string>
 
 </resources>

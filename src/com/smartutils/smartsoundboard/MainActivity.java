@@ -9,8 +9,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -26,6 +27,8 @@ import android.media.MediaRecorder;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -47,7 +50,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 	private GridView grid;
 	private AssetManager assetManager;
 	
-	private List<MediaPlayer> players;
+	private Set<MediaPlayer> players;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +63,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		
 		buttonLabels = new ArrayList<String>();
 		fileNames = new ArrayList<String>();
-		players = new ArrayList<MediaPlayer>();
+		players = new HashSet<MediaPlayer>();
 		
 		grid = (GridView) findViewById(R.id.grid);
 		
@@ -89,6 +92,38 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		// Set up the drawer.
 		mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
 		
+	}
+	
+	public boolean onCreateOptionsMenu(Menu menu) {
+	
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
+	
+	public boolean onOptionsItemSelected(MenuItem item) {
+	
+		if (item.getItemId() == R.id.stop)
+			killAllPlayers();
+		
+		return true;
+	}
+	
+	private void killAllPlayers() {
+	
+		synchronized (players) {
+			
+			for (MediaPlayer mp : players) {
+				if (mp != null) {
+					try {
+						mp.stop();
+						mp.reset();
+						mp.release();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
 	}
 	
 	private void downloadDank(final String url) {
@@ -277,11 +312,18 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 						public void onCompletion(MediaPlayer mp) {
 						
 							player.release();
+							synchronized (players) {
+								players.remove(player);
+							}
 							
 						}
 					});
 					long start = descriptor.getStartOffset();
 					long end = descriptor.getLength();
+					
+					synchronized (players) {
+						players.add(player);
+					}
 					
 					player.setDataSource(descriptor.getFileDescriptor(), start, end);
 					descriptor.close();
@@ -299,9 +341,17 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 							public void onCompletion(MediaPlayer mp) {
 							
 								player.release();
+								synchronized (players) {
+									players.remove(player);
+								}
 								
 							}
 						});
+						
+						synchronized (players) {
+							players.add(player);
+						}
+						
 						in = new FileInputStream(fileName);
 						player.setDataSource(in.getFD());
 						
@@ -309,9 +359,6 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 						player.prepare();
 						
 						player.start();
-						synchronized (players) {
-							players.add(player);
-						}
 						
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -327,7 +374,6 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 			
 			return null;
 		}
-		
 	}
 	
 	private class DankDownloader extends AsyncTask<Void, Void, Void> {
