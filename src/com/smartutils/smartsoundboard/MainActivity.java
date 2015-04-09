@@ -477,7 +477,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		private String fileName;
 		private MediaRecorder mRecorder;
 		
-		private DankRecorder(String filename) {
+		DankRecorder(String filename) {
 		
 			this.fileName = filename;
 			
