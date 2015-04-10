@@ -486,8 +486,8 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 			mProgressDialog.setTitle(R.string.record);
 			mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 			mProgressDialog.setCancelable(true);
-			// fuck you this is America we use whatever methods we want
-			mProgressDialog.setButton("Stop recording", new DialogInterface.OnClickListener() {
+
+			mProgressDialog.setButton(0,"Stop recording", new DialogInterface.OnClickListener() {
 				
 				public void onClick(DialogInterface dialog, int whichButton) {
 				
