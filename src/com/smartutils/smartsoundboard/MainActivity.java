@@ -202,7 +202,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 							System.gc();
 						}
 						
-					}).setCancelable(false).show();
+					}).setCancelable(true).show();
 			
 		} else
 			run = true;
