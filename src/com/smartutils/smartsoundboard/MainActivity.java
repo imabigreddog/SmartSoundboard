@@ -118,6 +118,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 						mp.stop();
 						mp.reset();
 						mp.release();
+						players.remove(mp);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
